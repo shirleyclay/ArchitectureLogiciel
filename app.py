@@ -3,7 +3,9 @@ import pandas as pd
 import dash_html_components as html
 
 data = pd.read_csv("https://static.data.gouv.fr/resources/classement-thematique-des-sujets-de-journaux-televises-janvier-2005-septembre-2020/20201202-114045/ina-barometre-jt-tv-donnees-mensuelles-2005-2020-nombre-de-sujets.csv",
-    encoding='Windows-1250',sep=";")
+    encoding='cp1252',sep=";")
+
+#Quand pb d'encodage : tester utf8, cp1252, latin1
 
 #Je remarque qu'il y a des headers  dans le csv mais ils ne sont pas complets car on a les chaînes de télé sur la première ligne.
 #J'aurais voulu que dans les headers on ait directement la chaîne inscrite.
