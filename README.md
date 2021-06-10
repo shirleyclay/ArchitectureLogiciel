@@ -1,4 +1,4 @@
-# ArchitectureLogiciel
+# ArchitectureLogicielle
 Projet d'architecture logiciel : visualisation des données
 
 Etape 0:
