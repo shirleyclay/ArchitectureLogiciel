@@ -1,7 +1,7 @@
 # ArchitectureLogicielle
 Projet d'architecture logiciel : visualisation des données
 
-• Créer une environnement virtuel <br/>
+• Créer un environnement virtuel <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sous mac : python3 -m venv venv<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sous windows : python -m venv venv<br/><br/>
 
