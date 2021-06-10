@@ -62,4 +62,7 @@ if __name__ == '__main__':
     app.run_server(debug=True)
 
 #Graph avec pour chaque chaîne l'évolution d'un sujet sélectionné dans une liste.
-#Camembert pour voir la part sur un 
+#Part de chaque sujet sur une chaîne
+#Listes de chaque chaîne
+#Somme du nombre de sujets diffusés par chaîne
+#Diagramme en barres empilées avec part de chaque sujet 
