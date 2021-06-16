@@ -1,12 +1,27 @@
 from logging import info
 import dash
-from numpy import nan_to_num
+from dash_core_components.Graph import Graph
+from numpy import character, nan_to_num
 import pandas as pd
 import dash_html_components as html
 import datetime
 import locale #Pour le format de date
 import dash_bootstrap_components as dbc
 import  math
+import dash_core_components as dcc
+from dash.dependencies import Input, Output
+import plotly.express as px
+
+
+import ssl
+ssl._create_default_https_context=ssl._create_unverified_context
+
+
+bootstrap_theme=[dbc.themes.BOOTSTRAP,'https://use.fontawesome.com/releases/v5.9.0/css/all.css']
+
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 data = pd.read_csv("https://static.data.gouv.fr/resources/classement-thematique-des-sujets-de-journaux-televises-janvier-2005-septembre-2020/20201202-114045/ina-barometre-jt-tv-donnees-mensuelles-2005-2020-nombre-de-sujets.csv",
     encoding='cp1252',sep=";")
@@ -18,8 +33,9 @@ data = pd.read_csv("https://static.data.gouv.fr/resources/classement-thematique-
 
 headers = data.columns.values
 ligne0 = (data.iloc[0])
-for i in range(2,9):
-    headers[i] = "Nombre de sujets JT de "+ " " + ligne0[i]
+for i in range(2,8):
+    headers[i] = "Nombre de sujets JT de " + ligne0[i]
+headers[8]= "Nombre de sujets JT de toutes les chaînes"
 data.drop(data.columns.values[9],axis=1,inplace=True)
 data.drop(0,axis=0,inplace=True)
 headers= headers[0:9]
@@ -29,16 +45,16 @@ locale.setlocale(locale.LC_TIME,'fr_FR'); #Obligatoire pour que ça reconnaisse 
 data['MOIS']=data['MOIS'].apply(lambda _: datetime.datetime.strptime(_,"%B-%y").strftime("%m-%Y"))
 
 #format entier
-data.iloc[1:,2]=data.iloc[1:,2].astype(float)
-data.iloc[1:,3]=data.iloc[1:,3].astype(float)
-data.iloc[1:,4]=data.iloc[1:,4].astype(float)
-data.iloc[1:,5]=data.iloc[1:,5].astype(float)
-data.iloc[1:,6]=data.iloc[1:,6].astype(float)
-data.iloc[1:,7]=data.iloc[1:,7].astype(float)
-data.iloc[1:,8]=data.iloc[1:,8].astype(float)
+data.iloc[0:,2]=data.iloc[0:,2].astype(float)
+data.iloc[0:,3]=data.iloc[0:,3].astype(float)
+data.iloc[0:,4]=data.iloc[0:,4].astype(float)
+data.iloc[0:,5]=data.iloc[0:,5].astype(float)
+data.iloc[0:,6]=data.iloc[0:,6].astype(float)
+data.iloc[0:,7]=data.iloc[0:,7].astype(float)
+data.iloc[0:,8]=data.iloc[0:,8].astype(float)
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+#external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+app = dash.Dash(__name__, external_stylesheets=bootstrap_theme)
 
 def generate_table(dataframe, max_rows=100):
     return html.Table([
@@ -53,7 +69,9 @@ def generate_table(dataframe, max_rows=100):
     ])
     
 
-color_l=['info',"secondary","success","warning","danger","Test","Test1"]
+#color_l=['info',"secondary","success","warning","danger","Test","Test1"]
+
+color_l=["red","pink","red","red","red","red"]
 def col_sum(data,col_idx):
     r = 0
     for i in range(2,data.shape[0]-1):
@@ -85,6 +103,7 @@ card4 = create_card("Nombre de sujet JT de Canal +", col_sum(data,5),color_l[3])
 card5 = create_card("Nombre de sujet JT de Arte", col_sum(data,6),color_l[4])
 card6 = create_card("Nombre de sujet JT de M6", col_sum(data,7),color_l[5])
 
+
 card = dbc.Row([dbc.Col(id='card1', children=[card1], lg=3,width=6), 
                 dbc.Col(id='card2', children=[card2], lg=3,width=6), 
                 dbc.Col(id='card3', children=[card3], lg=3,width=6), 
@@ -95,18 +114,43 @@ card = dbc.Row([dbc.Col(id='card1', children=[card1], lg=3,width=6),
                )
 
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+@app.callback(
+    Output("pie-chart", "figure"), 
+    Input("Chaine_TV", "value"))
+def generate_chart(Chaine_TV):
+    print("dans generate chart")
+    #print(Chaine_TV)
+    df_test2= pd.to_numeric(data[Chaine_TV])
+    col = ["THEMATIQUES", Chaine_TV]
+    df_test2= data[col].groupby("THEMATIQUES").sum().reset_index()
+    print(df_test2)
+    fig = px.pie(df_test2, values=Chaine_TV, names=df_test2["THEMATIQUES"],title="Repartition du "+(Chaine_TV[0].lower())+Chaine_TV[1:])
+    return fig
 
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+
 
 app.layout = html.Div(children=[
     html.H4(children='Classement thématique des sujets de journaux télévisés de janvier 2005 à septembre 2020'),
-    generate_table(data),
-    card
-])
+    html.Br(),card,html.Br(),
+    html.P("Values:"),
+    dcc.Dropdown(
+        id='Chaine_TV', 
+        value=headers[8], 
+        options=[{'value': x, 'label': x} 
+                 for x in data.columns[2:,]],
+        clearable=False
+    ),
+    dcc.Graph(id="pie-chart"),
+    
+    generate_table(data)
+    ]
+    ,style={"height": "100vh"}
+)
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
+
 
 #Graph avec pour chaque chaîne l'évolution d'un sujet sélectionné dans une liste.
 #Part de chaque sujet sur une chaîne
