@@ -11,6 +11,8 @@ import  math
 import dash_core_components as dcc
 from dash.dependencies import Input, Output
 import plotly.express as px
+from datetime import date
+
 
 
 import ssl
@@ -139,10 +141,50 @@ def generate_chart(Chaine_TV):
     df_test2= data[col].groupby("THEMATIQUES").sum().reset_index()
 
     # Réalisation du graphique circulaire
-    fig = px.pie(df_test2, values=Chaine_TV, names=df_test2["THEMATIQUES"],title="Repartition du "+(Chaine_TV[0].lower())+Chaine_TV[1:])
+    fig = px.pie(df_test2, values=Chaine_TV, names=df_test2["THEMATIQUES"],title="Repartition du "+(Chaine_TV[0].lower())+Chaine_TV[1:]+" toutes périodes confondues")
     return fig
 
 
+#######################################################################################
+############################### SERIES TEMPORELLES## ##################################
+#######################################################################################
+@app.callback(
+    Output("timeline", "figure"), 
+    Input("Chaine_TV", "value"),
+    #Input('dateSelection','start-date'),
+    #Input('dateSelection','end-date')
+    )
+def generate_chart(Chaine_TV
+# ,start_date,end_date
+):
+   
+    # Préparation des données pour réaliser le graphique circulaire
+    df_test2= pd.to_numeric(data[Chaine_TV])
+    col = ["MOIS","THEMATIQUES", Chaine_TV]
+    df_test2= data[col]
+
+    # if start_date is not None :
+    #     start_date_object = date.fromisoformat(start_date)
+    #     start_date_string = start_date_object.strftime('%B %d, %Y')
+    #     df_test2  = data.loc[(data['MOIS'] >= start_date_string)]
+    # if end_date is not None:
+    #     end_date_object = date.fromisoformat(end_date)
+    #     end_date_string = end_date_object.strftime('%B %d, %Y')
+    #     df_test2 = data.loc[data["MOIS"]<=end_date_string]
+
+    df_test2 = df_test2.pivot_table(columns="THEMATIQUES",values=Chaine_TV,index=["MOIS"],aggfunc=sum)
+
+    df_test2 = df_test2.div(df_test2.sum(axis=1), axis=0).reset_index()
+    df_test2['MOIS']= pd.to_datetime(df_test2['MOIS'],format="%m-%Y")
+    df_test2 = df_test2.sort_values(by="MOIS")
+    
+
+    # Réalisation du graphique timeline
+    fig2 = px.line(df_test2, x = (df_test2["MOIS"]),y=df_test2.columns[1:,],
+        title="Taux de présence des thèmes sur le "+(Chaine_TV[0].lower())+Chaine_TV[1:])
+    fig2.update_yaxes(title_text='Pourcentage du thème dans les sujets traités')
+
+    return fig2
 
 #######################################################################################
 
@@ -161,8 +203,14 @@ app.layout = html.Div(children=[
         clearable=False,
 
     ),
+    dcc.DatePickerRange(
+        id='dateSelection',
+        min_date_allowed=pd.to_datetime(data["MOIS"]).min(),
+        max_date_allowed=pd.to_datetime(data["MOIS"]).max(),
+    ),
     dcc.Graph(id="pie-chart"),
-
+    
+    dcc.Graph(id="timeline"),
     generate_table(data)
     ]
     ,style={"height": "100vh"}
@@ -179,4 +227,5 @@ if __name__ == '__main__':
 #Somme du nombre de sujets diffusés par chaîne
 #Diagramme en barres empilées avec part de chaque sujet 
 # Quelles sont les lignes éditoriales de chaque chaîne ? Voir si il y a eu du changement dans chaque ligne éditoriale.
-# L'évolution du nombre de sujets de JT par mois par chaîne ( à mettre en relief avec le temps de JT sur chaque chaîne) 
+# L'évolution du nombre de sujets de JT par mois par chaîne ( à mettre en relief avec le temps de JT sur chaque chaîne)
+# timeline 
