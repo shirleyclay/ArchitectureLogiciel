@@ -56,6 +56,12 @@ data.iloc[0:,8]=data.iloc[0:,8].astype(float)
 #external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=bootstrap_theme)
 
+
+#######################################################################################
+############################### TABLEAU DES DONNNEES ##################################
+#######################################################################################
+
+
 def generate_table(dataframe, max_rows=100):
     return html.Table([
         html.Thead(
@@ -69,9 +75,11 @@ def generate_table(dataframe, max_rows=100):
     ])
     
 
-#color_l=['info',"secondary","success","warning","danger","Test","Test1"]
+#######################################################################################
+################################ ENCADRES DE DONNEES ##################################
+#######################################################################################
 
-color_l=["red","pink","red","red","red","red"]
+color_l=["darkturquoise","deepskyblue","dodgerblue","royalblue","blue","darkblue"]
 def col_sum(data,col_idx):
     r = 0
     for i in range(2,data.shape[0]-1):
@@ -104,28 +112,40 @@ card5 = create_card("Nombre de sujet JT de Arte", col_sum(data,6),color_l[4])
 card6 = create_card("Nombre de sujet JT de M6", col_sum(data,7),color_l[5])
 
 
-card = dbc.Row([dbc.Col(id='card1', children=[card1], lg=3,width=6), 
-                dbc.Col(id='card2', children=[card2], lg=3,width=6), 
-                dbc.Col(id='card3', children=[card3], lg=3,width=6), 
-                dbc.Col(id='card4', children=[card4], lg=3,width=6),
-                dbc.Col(id='card5', children=[card5], lg=3,width=6),
-                dbc.Col(id='card6', children=[card6], lg=3,width=6)
-                ]
+card = dbc.Row([dbc.Col(id='card1', children=[card1], lg=2,width=3), 
+                dbc.Col(id='card2', children=[card2], lg=2,width=3), 
+                dbc.Col(id='card3', children=[card3], lg=2,width=3), 
+                dbc.Col(id='card4', children=[card4], lg=2,width=3),
+                dbc.Col(id='card5', children=[card5], lg=2,width=3),
+                dbc.Col(id='card6', children=[card6], lg=2,width=3)
+                ],style={'width': '97%', 'padding': '25px 25px 25px 25px'},
+                align="center",
                )
 
+
+
+#######################################################################################
+############################### GRAPHIQUE CIRCULAIRE ##################################
+#######################################################################################
 
 @app.callback(
     Output("pie-chart", "figure"), 
     Input("Chaine_TV", "value"))
 def generate_chart(Chaine_TV):
-    print("dans generate chart")
-    #print(Chaine_TV)
+   
+    # Préparation des données pour réaliser le graphique circulaire
     df_test2= pd.to_numeric(data[Chaine_TV])
     col = ["THEMATIQUES", Chaine_TV]
     df_test2= data[col].groupby("THEMATIQUES").sum().reset_index()
-    print(df_test2)
+
+    # Réalisation du graphique circulaire
     fig = px.pie(df_test2, values=Chaine_TV, names=df_test2["THEMATIQUES"],title="Repartition du "+(Chaine_TV[0].lower())+Chaine_TV[1:])
     return fig
+
+
+
+#######################################################################################
+
 
 
 
@@ -138,10 +158,11 @@ app.layout = html.Div(children=[
         value=headers[8], 
         options=[{'value': x, 'label': x} 
                  for x in data.columns[2:,]],
-        clearable=False
+        clearable=False,
+
     ),
     dcc.Graph(id="pie-chart"),
-    
+
     generate_table(data)
     ]
     ,style={"height": "100vh"}
