@@ -179,7 +179,7 @@ def generate_timeline(Chaine_TV,FiltreVisionDate):
     # df_test2 = df_test2.div(df_test2.sum(axis=1), axis=0).reset_index()
     # df_test2['MOIS']= pd.to_datetime(df_test2['MOIS'],format="%m-%Y")
     # df_test2["ANNEE"] = df_test2["MOIS"].dt.year
-    print(df_test2)
+    #print(df_test2)
     # df_test2 = df_test2.sort_values(by="MOIS")
 
     # Réalisation du graphique timeline
@@ -208,11 +208,42 @@ radio_item=dcc.RadioItems(
 filtre_label =html.H2("Select date range : ",style={'color':'black'})
 filtre_line = dbc.Row([dbc.Col(filtre_label , lg=3,width=6), dbc.Col(radio_item, lg=6, width=6)])
 
-
+#######################################################################################
+############################### DIAGRAMME EN BARRES ###################################
 #######################################################################################
 
+# data.iloc[0:,2:9]=data.iloc[0:,2:9].astype(float)
+# print(data)
 
 
+# df_test2 =data[data.columns[1:9]].groupby("THEMATIQUES").sum().reset_index()
+
+# for i in df_test2.columns[1:9]:
+#     df_test2[i]=round(df_test2[i]/df_test2["Nombre de sujets JT de toutes les chaînes"]*100,2)
+
+
+# print(df_test2)
+
+
+
+    
+# def generate_bar():
+#     data.iloc[0:,2:9]=data.iloc[0:,2:9].astype(float)
+#     df_test2 =data[data.columns[1:9]].groupby("THEMATIQUES").sum().reset_index()
+#     for i in df_test2.columns[1:9]:
+#         df_test2[i]=round(df_test2[i]/df_test2["Nombre de sujets JT de toutes les chaînes"]*100,2)
+#     fig = px.bar(df_test2, x="THEMATIQUES", y=df_test2.columns[1], color="THEMATIQUES", orientation='h',
+#              height=400,
+#              title='Restaurant bills')
+#     return fig
+
+
+
+
+
+
+
+#######################################################################################
 
 app.layout = html.Div(children=[
     html.H4(children='Classement thématique des sujets de journaux télévisés de janvier 2005 à septembre 2020'),
@@ -231,7 +262,9 @@ app.layout = html.Div(children=[
 ),
     filtre_line,
     dcc.Graph(id="timeline"),
-    generate_table(data)
+
+    #generate_bar(),
+    generate_table(data),
     ]
     ,style={"height": "100vh"}
 )
