@@ -1,17 +1,14 @@
 from logging import info
 import dash
-from dash_core_components.Graph import Graph
-from numpy import character, nan_to_num
 import pandas as pd
 import dash_html_components as html
 import datetime
 import locale #Pour le format de date
 import dash_bootstrap_components as dbc
-import  math
+import math
 import dash_core_components as dcc
 from dash.dependencies import Input, Output
 import plotly.express as px
-from datetime import date
 
 
 
@@ -141,8 +138,30 @@ def generate_chart(Chaine_TV):
     df_test2= data[col].groupby("THEMATIQUES").sum().reset_index()
 
     # Réalisation du graphique circulaire
-    fig = px.pie(df_test2, values=Chaine_TV, names=df_test2["THEMATIQUES"],title="Repartition du "+(Chaine_TV[0].lower())+Chaine_TV[1:]+" toutes périodes confondues")
+    fig = px.pie(df_test2, values=Chaine_TV, names=df_test2["THEMATIQUES"],title="Repartition du "+(Chaine_TV[0].lower())+Chaine_TV[1:]+"<br>toutes périodes confondues")
+    fig.update_layout(title_x=0.5)
     return fig
+
+
+
+#######################################################################################
+############################### GRAPHIQUE BAR ##################################
+#######################################################################################
+
+@app.callback(
+    Output("bar-chart", "figure"), 
+    Input("Chaine_TV", "value"))
+def generate_chart(Chaine_TV):
+   
+    # Préparation des données pour réaliser le graphique circulaire
+    df_test2= pd.to_numeric(data[Chaine_TV])
+    col = ["THEMATIQUES", Chaine_TV]
+    df_test2= data[col].groupby("THEMATIQUES").sum().reset_index()
+
+    # Réalisation du graphique circulaire
+    fig3 = px.bar(df_test2, x=Chaine_TV, y=df_test2["THEMATIQUES"],title="Repartition du "+(Chaine_TV[0].lower())+Chaine_TV[1:]+"<br>toutes périodes confondues")
+    fig3.update_layout(title_x=0.5)
+    return fig3
 
 
 #######################################################################################
@@ -258,15 +277,15 @@ app.layout = html.Div(children=[
 
     ),
     
-    dcc.Graph(id="pie-chart",style={'width': '50%', 'padding': '1em 2em 2em'}
-),
+    dcc.Graph(id="pie-chart",style={'width': '50%', 'padding': '1em 2em 2em','float':'left'}),
+    dcc.Graph(id="bar-chart",style={'width': '50%','padding': '1em 2em 2em','float':'right'}),
+    
     filtre_line,
     dcc.Graph(id="timeline"),
 
     #generate_bar(),
     generate_table(data),
     ]
-    ,style={"height": "100vh"}
 )
 
 
