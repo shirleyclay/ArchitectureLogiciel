@@ -151,40 +151,63 @@ def generate_chart(Chaine_TV):
 @app.callback(
     Output("timeline", "figure"), 
     Input("Chaine_TV", "value"),
-    #Input('dateSelection','start-date'),
-    #Input('dateSelection','end-date')
-    )
-def generate_chart(Chaine_TV
-# ,start_date,end_date
-):
+    Input("FiltreVisionDate","value"))
+def generate_timeline(Chaine_TV,FiltreVisionDate):
    
     # Préparation des données pour réaliser le graphique circulaire
     df_test2= pd.to_numeric(data[Chaine_TV])
     col = ["MOIS","THEMATIQUES", Chaine_TV]
     df_test2= data[col]
-
-    # if start_date is not None :
-    #     start_date_object = date.fromisoformat(start_date)
-    #     start_date_string = start_date_object.strftime('%B %d, %Y')
-    #     df_test2  = data.loc[(data['MOIS'] >= start_date_string)]
-    # if end_date is not None:
-    #     end_date_object = date.fromisoformat(end_date)
-    #     end_date_string = end_date_object.strftime('%B %d, %Y')
-    #     df_test2 = data.loc[data["MOIS"]<=end_date_string]
-
-    df_test2 = df_test2.pivot_table(columns="THEMATIQUES",values=Chaine_TV,index=["MOIS"],aggfunc=sum)
-
-    df_test2 = df_test2.div(df_test2.sum(axis=1), axis=0).reset_index()
     df_test2['MOIS']= pd.to_datetime(df_test2['MOIS'],format="%m-%Y")
-    df_test2 = df_test2.sort_values(by="MOIS")
-    
+    df_test2["ANNEE"] = df_test2["MOIS"].dt.year
+
+    if( FiltreVisionDate == "Mois"):
+        df_test2 = df_test2.pivot_table(columns="THEMATIQUES",values=Chaine_TV,index=["MOIS"],aggfunc=sum)
+        df_test2 = df_test2.div(df_test2.sum(axis=1), axis=0).reset_index()
+        df_test2 = df_test2.sort_values(by="MOIS")
+        fig2 = px.line(df_test2, x = (df_test2["MOIS"]),y=df_test2.columns[1:,],
+        title="Taux de présence des thèmes sur le "+(Chaine_TV[0].lower())+Chaine_TV[1:])
+    elif (FiltreVisionDate == "Année"):
+        df_test2 = df_test2.pivot_table(columns="THEMATIQUES",values=Chaine_TV,index=["ANNEE"],aggfunc=sum)
+        df_test2 = df_test2.div(df_test2.sum(axis=1), axis=0).reset_index()
+        df_test2 = df_test2.sort_values(by="ANNEE")
+        fig2 = px.line(df_test2, x = (df_test2["ANNEE"]),y=df_test2.columns[1:,],
+        title="Taux de présence des thèmes sur le "+(Chaine_TV[0].lower())+Chaine_TV[1:])
+
+    # df_test2 = df_test2.pivot_table(columns="THEMATIQUES",values=Chaine_TV,index=["MOIS"],aggfunc=sum)
+
+    # df_test2 = df_test2.div(df_test2.sum(axis=1), axis=0).reset_index()
+    # df_test2['MOIS']= pd.to_datetime(df_test2['MOIS'],format="%m-%Y")
+    # df_test2["ANNEE"] = df_test2["MOIS"].dt.year
+    print(df_test2)
+    # df_test2 = df_test2.sort_values(by="MOIS")
 
     # Réalisation du graphique timeline
-    fig2 = px.line(df_test2, x = (df_test2["MOIS"]),y=df_test2.columns[1:,],
-        title="Taux de présence des thèmes sur le "+(Chaine_TV[0].lower())+Chaine_TV[1:])
+    # fig2 = px.line(df_test2, x = (df_test2["MOIS"]),y=df_test2.columns[1:,],
+    #     title="Taux de présence des thèmes sur le "+(Chaine_TV[0].lower())+Chaine_TV[1:])
     fig2.update_yaxes(title_text='Pourcentage du thème dans les sujets traités')
+    fig2.update_xaxes(rangeslider_visible=True)
 
     return fig2
+
+
+#######################################################################################
+############################### FILTRE AFFICHAGE DATES#################################
+#######################################################################################
+radio_item=dcc.RadioItems(
+    id ="FiltreVisionDate",
+  options=[
+      #{'label': 'choix date', 'value': 'choix'},
+      {'label': 'Vision au mois', 'value': 'Mois'},
+      {'label': 'Vision à l\'année', 'value': 'Année',},
+      
+  ], 
+  value='Mois',
+  labelStyle={'display': 'inline-block', 'width': '20%','color': 'black','marginTop': 13},
+  )
+filtre_label =html.H2("Select date range : ",style={'color':'black'})
+filtre_line = dbc.Row([dbc.Col(filtre_label , lg=3,width=6), dbc.Col(radio_item, lg=6, width=6)])
+
 
 #######################################################################################
 
@@ -203,13 +226,10 @@ app.layout = html.Div(children=[
         clearable=False,
 
     ),
-    dcc.DatePickerRange(
-        id='dateSelection',
-        min_date_allowed=pd.to_datetime(data["MOIS"]).min(),
-        max_date_allowed=pd.to_datetime(data["MOIS"]).max(),
-    ),
-    dcc.Graph(id="pie-chart"),
     
+    dcc.Graph(id="pie-chart",style={'width': '50%', 'padding': '1em 2em 2em'}
+),
+    filtre_line,
     dcc.Graph(id="timeline"),
     generate_table(data)
     ]
