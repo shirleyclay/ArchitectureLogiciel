@@ -133,12 +133,12 @@ card = dbc.Row([dbc.Col(id='card1', children=[card1], lg=2,width=3),
 def generate_chart(Chaine_TV):
    
     # Préparation des données pour réaliser le graphique circulaire
-    df_test2= pd.to_numeric(data[Chaine_TV])
+    df_test0= pd.to_numeric(data[Chaine_TV])
     col = ["THEMATIQUES", Chaine_TV]
-    df_test2= data[col].groupby("THEMATIQUES").sum().reset_index()
+    df_test0= data[col].groupby("THEMATIQUES").sum().reset_index()
 
     # Réalisation du graphique circulaire
-    fig = px.pie(df_test2, values=Chaine_TV, names=df_test2["THEMATIQUES"],title="Repartition du "+(Chaine_TV[0].lower())+Chaine_TV[1:]+"<br>toutes périodes confondues")
+    fig = px.pie(df_test0, values=Chaine_TV, names=df_test0["THEMATIQUES"],title="Repartition du "+(Chaine_TV[0].lower())+Chaine_TV[1:]+"<br>toutes périodes confondues")
     fig.update_layout(title_x=0.5)
     return fig
 
@@ -154,12 +154,12 @@ def generate_chart(Chaine_TV):
 def generate_chart(Chaine_TV):
    
     # Préparation des données pour réaliser le graphique circulaire
-    df_test2= pd.to_numeric(data[Chaine_TV])
+    df_test= pd.to_numeric(data[Chaine_TV])
     col = ["THEMATIQUES", Chaine_TV]
-    df_test2= data[col].groupby("THEMATIQUES").sum().reset_index()
+    df_test= data[col].groupby("THEMATIQUES").sum().reset_index()
 
     # Réalisation du graphique circulaire
-    fig3 = px.bar(df_test2, x=Chaine_TV, y=df_test2["THEMATIQUES"],title="Repartition du "+(Chaine_TV[0].lower())+Chaine_TV[1:]+"<br>toutes périodes confondues")
+    fig3 = px.bar(df_test, x=Chaine_TV, y=df_test["THEMATIQUES"],title="Repartition du "+(Chaine_TV[0].lower())+Chaine_TV[1:]+"<br>toutes périodes confondues")
     fig3.update_layout(title_x=0.5)
     return fig3
 
@@ -191,17 +191,6 @@ def generate_timeline(Chaine_TV,FiltreVisionDate):
         df_test2 = df_test2.sort_values(by="ANNEE")
         fig2 = px.line(df_test2, x = (df_test2["ANNEE"]),y=df_test2.columns[1:,],title="Taux de présence des thèmes sur le "+(Chaine_TV[0].lower())+Chaine_TV[1:])
 
-    # df_test2 = df_test2.pivot_table(columns="THEMATIQUES",values=Chaine_TV,index=["MOIS"],aggfunc=sum)
-
-    # df_test2 = df_test2.div(df_test2.sum(axis=1), axis=0).reset_index()
-    # df_test2['MOIS']= pd.to_datetime(df_test2['MOIS'],format="%m-%Y")
-    # df_test2["ANNEE"] = df_test2["MOIS"].dt.year
-    #print(df_test2)
-    # df_test2 = df_test2.sort_values(by="MOIS")
-
-    # Réalisation du graphique timeline
-    # fig2 = px.line(df_test2, x = (df_test2["MOIS"]),y=df_test2.columns[1:,],
-    #     title="Taux de présence des thèmes sur le "+(Chaine_TV[0].lower())+Chaine_TV[1:])
     fig2.update_yaxes(title_text='Pourcentage du thème dans les sujets traités')
     fig2.update_xaxes(rangeslider_visible=True)
 
@@ -229,33 +218,26 @@ filtre_line = dbc.Row([dbc.Col(filtre_label , lg=3,width=6), dbc.Col(radio_item,
 ############################### DIAGRAMME EN BARRES ###################################
 #######################################################################################
 
-# data.iloc[0:,2:9]=data.iloc[0:,2:9].astype(float)
-# print(data)
+df_test3 =data[data.columns[1:9]].groupby("THEMATIQUES").sum().reset_index()
+
+for i in df_test3.columns[1:9]:
+    df_test3[i]=round(df_test3[i]/df_test3["Nombre de sujets JT de toutes les chaînes"]*100,2)
 
 
-# df_test2 =data[data.columns[1:9]].groupby("THEMATIQUES").sum().reset_index()
-
-# for i in df_test2.columns[1:9]:
-#     df_test2[i]=round(df_test2[i]/df_test2["Nombre de sujets JT de toutes les chaînes"]*100,2)
-
-
-# print(df_test2)
+print(df_test3)
 
 
 
-    
-# def generate_bar():
-#     data.iloc[0:,2:9]=data.iloc[0:,2:9].astype(float)
-#     df_test2 =data[data.columns[1:9]].groupby("THEMATIQUES").sum().reset_index()
-#     for i in df_test2.columns[1:9]:
-#         df_test2[i]=round(df_test2[i]/df_test2["Nombre de sujets JT de toutes les chaînes"]*100,2)
-#     fig = px.bar(df_test2, x="THEMATIQUES", y=df_test2.columns[1], color="THEMATIQUES", orientation='h',
-#              height=400,
-#              title='Restaurant bills')
-#     return fig
-
-
-
+def generate_bar():
+    data.iloc[0:,2:9]=data.iloc[0:,2:9].astype(float)
+    df_test3 =data[data.columns[1:9]].groupby("THEMATIQUES").sum().reset_index()
+    for i in df_test3.columns[1:9]:
+        df_test3[i]=round(df_test3[i]/df_test3["Nombre de sujets JT de toutes les chaînes"]*100,2)
+    fig = px.bar(df_test3, y="THEMATIQUES",x=df_test3.columns[1],color="THEMATIQUES", orientation='h',
+             height=400,
+             title='Restaurant bills')
+    fig.show()
+    return fig
 
 
 
@@ -279,7 +261,6 @@ app.layout = html.Div(children=[
     html.Br(),
     filtre_line,
     dcc.Graph(id="timeline"),
-
     #generate_bar(),
     generate_table(data),
     ]
