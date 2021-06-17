@@ -184,14 +184,12 @@ def generate_timeline(Chaine_TV,FiltreVisionDate):
         df_test2 = df_test2.pivot_table(columns="THEMATIQUES",values=Chaine_TV,index=["MOIS"],aggfunc=sum)
         df_test2 = df_test2.div(df_test2.sum(axis=1), axis=0).reset_index()
         df_test2 = df_test2.sort_values(by="MOIS")
-        fig2 = px.line(df_test2, x = (df_test2["MOIS"]),y=df_test2.columns[1:,],
-        title="Taux de présence des thèmes sur le "+(Chaine_TV[0].lower())+Chaine_TV[1:])
+        fig2 = px.line(df_test2, x = (df_test2["MOIS"]),y=df_test2.columns[1:,],title="Taux de présence des thèmes sur le "+(Chaine_TV[0].lower())+Chaine_TV[1:])
     elif (FiltreVisionDate == "Année"):
         df_test2 = df_test2.pivot_table(columns="THEMATIQUES",values=Chaine_TV,index=["ANNEE"],aggfunc=sum)
         df_test2 = df_test2.div(df_test2.sum(axis=1), axis=0).reset_index()
         df_test2 = df_test2.sort_values(by="ANNEE")
-        fig2 = px.line(df_test2, x = (df_test2["ANNEE"]),y=df_test2.columns[1:,],
-        title="Taux de présence des thèmes sur le "+(Chaine_TV[0].lower())+Chaine_TV[1:])
+        fig2 = px.line(df_test2, x = (df_test2["ANNEE"]),y=df_test2.columns[1:,],title="Taux de présence des thèmes sur le "+(Chaine_TV[0].lower())+Chaine_TV[1:])
 
     # df_test2 = df_test2.pivot_table(columns="THEMATIQUES",values=Chaine_TV,index=["MOIS"],aggfunc=sum)
 
@@ -276,10 +274,9 @@ app.layout = html.Div(children=[
         clearable=False,
 
     ),
-    
     dcc.Graph(id="pie-chart",style={'width': '50%', 'padding': '1em 2em 2em','float':'left'}),
     dcc.Graph(id="bar-chart",style={'width': '50%','padding': '1em 2em 2em','float':'right'}),
-    
+    html.Br(),
     filtre_line,
     dcc.Graph(id="timeline"),
 
