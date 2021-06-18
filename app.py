@@ -9,6 +9,8 @@ import math
 import dash_core_components as dcc
 from dash.dependencies import Input, Output
 import plotly.express as px
+import plotly.graph_objects as go
+
 
 
 
@@ -149,19 +151,28 @@ def generate_chart(Chaine_TV):
 #######################################################################################
 
 @app.callback(
-    Output("bar-chart", "figure"), 
-    Input("Chaine_TV", "value"))
+    Output("bar-chart", "figure"),
+    Input('Chaine_TV','value'))
 def generate_chart(Chaine_TV):
    
-    # Préparation des données pour réaliser le graphique circulaire
-    df_test= pd.to_numeric(data[Chaine_TV])
-    col = ["THEMATIQUES", Chaine_TV]
-    df_test= data[col].groupby("THEMATIQUES").sum().reset_index()
+    data.iloc[0:,2:9]=data.iloc[0:,2:9].astype(float)
+    df_test3 =data[data.columns[1:9]].groupby("THEMATIQUES").sum().reset_index()
+    x=df_test3["THEMATIQUES"]
+    for i in df_test3.columns[1:9]:
+        df_test3[i]=round(df_test3[i]/df_test3["Nombre de sujets JT de toutes les chaînes"]*100,2)
+    
+    fig = go.Figure(go.Bar(x=df_test3["THEMATIQUES"], y=df_test3[df_test3.columns[1]], name=df_test3.columns[1].split("de ")[2]))
+    for i in range(2,7):
+        fig.add_trace(go.Bar(x=df_test3["THEMATIQUES"], y=df_test3[df_test3.columns[i]], name=df_test3.columns[i].split("de ")[2]))
+    fig.update_layout(barmode='stack', xaxis={'categoryorder':'category ascending'},title_text='Répartition par thématique du nombre de sujets traités par chaîne')
+    fig.update_yaxes(title_text='Part du nombre de sujets traités par chaine')
+    fig.update_xaxes(title_text="Thématiques")
 
-    # Réalisation du graphique circulaire
-    fig3 = px.bar(df_test, x=Chaine_TV, y=df_test["THEMATIQUES"],title="Repartition du "+(Chaine_TV[0].lower())+Chaine_TV[1:]+"<br>toutes périodes confondues")
-    fig3.update_layout(title_x=0.5)
-    return fig3
+
+
+    return fig
+
+
 
 
 #######################################################################################
@@ -211,43 +222,17 @@ radio_item=dcc.RadioItems(
   value='Mois',
   labelStyle={'display': 'inline-block', 'width': '20%','color': 'black','marginTop': 13},
   )
-filtre_label =html.H2("Select date range : ",style={'color':'black'})
+filtre_label =html.H2("Sélection de la vision : ",style={'color':'black'})
 filtre_line = dbc.Row([dbc.Col(filtre_label , lg=3,width=6), dbc.Col(radio_item, lg=6, width=6)])
-
-#######################################################################################
-############################### DIAGRAMME EN BARRES ###################################
-#######################################################################################
-
-df_test3 =data[data.columns[1:9]].groupby("THEMATIQUES").sum().reset_index()
-
-for i in df_test3.columns[1:9]:
-    df_test3[i]=round(df_test3[i]/df_test3["Nombre de sujets JT de toutes les chaînes"]*100,2)
-
-
-print(df_test3)
-
-
-
-def generate_bar():
-    data.iloc[0:,2:9]=data.iloc[0:,2:9].astype(float)
-    df_test3 =data[data.columns[1:9]].groupby("THEMATIQUES").sum().reset_index()
-    for i in df_test3.columns[1:9]:
-        df_test3[i]=round(df_test3[i]/df_test3["Nombre de sujets JT de toutes les chaînes"]*100,2)
-    fig = px.bar(df_test3, y="THEMATIQUES",x=df_test3.columns[1],color="THEMATIQUES", orientation='h',
-             height=400,
-             title='Restaurant bills')
-    fig.show()
-    return fig
-
-
-
 
 #######################################################################################
 
 app.layout = html.Div(children=[
-    html.H4(children='Classement thématique des sujets de journaux télévisés de janvier 2005 à septembre 2020'),
+    html.Br(),
+    html.H2(children='Classement thématique des sujets de journaux télévisés de janvier 2005 à septembre 2020',
+        style={'text-align': 'center','border-style':'solid',"border-color":"orange"}),
     html.Br(),card,html.Br(),
-    html.P("Values:"),
+    html.P("Filtre :"),
     dcc.Dropdown(
         id='Chaine_TV', 
         value=headers[8], 
@@ -261,7 +246,6 @@ app.layout = html.Div(children=[
     html.Br(),
     filtre_line,
     dcc.Graph(id="timeline"),
-    #generate_bar(),
     generate_table(data),
     ]
 )
