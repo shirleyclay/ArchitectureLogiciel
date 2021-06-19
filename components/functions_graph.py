@@ -29,12 +29,12 @@ def create_card(title, content,color):
 
 def affichage_kpi():
 
-    card1 = create_card("Nombre de sujet JT de TF1", col_sum(2),color_l[0])
-    card2 = create_card("Nombre de sujet JT de France 2", col_sum(3),color_l[1])
-    card3 = create_card("Nombre de sujet JT de France 3", col_sum(4),color_l[2])
-    card4 = create_card("Nombre de sujet JT de Canal +", col_sum(5),color_l[3])
-    card5 = create_card("Nombre de sujet JT de Arte", col_sum(6),color_l[4])
-    card6 = create_card("Nombre de sujet JT de M6", col_sum(7),color_l[5])
+    card1 = create_card("Nombre de sujets JT de TF1", col_sum(2),color_l[0])
+    card2 = create_card("Nombre de sujets JT de France 2", col_sum(3),color_l[1])
+    card3 = create_card("Nombre de sujets JT de France 3", col_sum(4),color_l[2])
+    card4 = create_card("Nombre de sujets JT de Canal +", col_sum(5),color_l[3])
+    card5 = create_card("Nombre de sujets JT de Arte", col_sum(6),color_l[4])
+    card6 = create_card("Nombre de sujets JT de M6", col_sum(7),color_l[5])
 
     card = dbc.Row([dbc.Col(id='card1', children=[card1], lg=2,width=3), 
                     dbc.Col(id='card2', children=[card2], lg=2,width=3), 
