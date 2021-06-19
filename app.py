@@ -58,10 +58,7 @@ def generate_chart(Chaine_TV):
 ################################ GRAPHIQUE BAR ########################################
 #######################################################################################
 
-@app.callback(
-    Output("bar-chart", "figure"),
-    Input('Chaine_TV','value'))
-def generate_bar(Chaine_TV):
+def generate_bar():
     return affichage_bar()
 
 
@@ -107,7 +104,7 @@ app.layout = html.Div(children=[
 
     ),
     dcc.Graph(id="pie-chart",style={'width': '50%', 'padding': '1em 2em 2em','float':'left'}),
-    dcc.Graph(id="bar-chart",style={'width': '50%','padding': '1em 2em 2em','float':'right'}),
+    dcc.Graph(figure=generate_bar(),style={'width': '50%','padding': '1em 2em 2em','float':'right'}),
     html.Br(),
     boutonradio(),
     dcc.Graph(id="timeline"),
