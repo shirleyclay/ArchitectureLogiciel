@@ -4,7 +4,7 @@ import dash_bootstrap_components as dbc
 import plotly.express as px
 import plotly.graph_objects as go
 import dash_core_components as dcc
-from components.functions_data import col_sum, data_pie, data_bar, data_serieTemp
+from datagraph.functions_data import col_sum, data_pie, data_bar, data_serieTemp
 
 #######################################################################################
 ################################## POUR LES KPI #######################################

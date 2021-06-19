@@ -10,9 +10,11 @@ import dash_core_components as dcc
 from dash.dependencies import Input, Output
 #import plotly.express as px
 #import plotly.graph_objects as go
-from components.functions_graph import generate_table, affichage_kpi, affichage_pie, affichage_bar, affichage_serieTemps,boutonradio
-from components.functions_data import data
+# from components.functions_graph import generate_table, affichage_kpi, affichage_pie, affichage_bar, affichage_serieTemps,boutonradio
+# from components.functions_data import data
 
+from datagraph.functions_graph import generate_table, affichage_kpi, affichage_pie, affichage_bar, affichage_serieTemps,boutonradio
+from datagraph.functions_data import data
 
 import ssl
 ssl._create_default_https_context=ssl._create_unverified_context
