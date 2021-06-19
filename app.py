@@ -63,7 +63,7 @@ app = dash.Dash(__name__, external_stylesheets=bootstrap_theme)
 #######################################################################################
 
 
-def generate_table(dataframe, max_rows=100):
+def generate_table(dataframe, max_rows=20):
     return html.Table([
         html.Thead(
             html.Tr([html.Th(col) for col in dataframe.columns])
@@ -246,7 +246,9 @@ app.layout = html.Div(children=[
     html.Br(),
     filtre_line,
     dcc.Graph(id="timeline"),
+    html.H3("Aperçu du jeu de données"),
     generate_table(data),
+    html.Footer(children="By Marianne Bellahmar - Shirley Clay - Romain Douesnard",style={'text-align': 'center'})
     ]
 )
 
