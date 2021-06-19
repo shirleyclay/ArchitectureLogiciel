@@ -65,7 +65,9 @@ def generate_table(dataframe, max_rows=20):
     ], style={ 'width': '100%',
                 'border-collapse': 'collapse',
                 'border': '3px solid blue',
-                'overflowY': 'scroll' }
+                'text-align': 'center',
+                'letter-spacing': '1px',
+                'font-style': 'italic'}
     )
     
 #######################################################################################

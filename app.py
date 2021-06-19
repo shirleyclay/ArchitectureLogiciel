@@ -110,7 +110,8 @@ app.layout = html.Div(children=[
     dcc.Graph(id="timeline"),
     html.H3("Aperçu du jeu de données : "),
     generate_table(data),
-    html.Footer(children="By Marianne Bellahmar - Shirley Clay - Romain Douesnard",style={'text-align': 'center'})
+    html.Footer(children="By Marianne Bellahmar - Shirley Clay - Romain Douesnard",style={'text-align': 'center'}),
+    html.Img(src='/assets/image.png', style={'width': '8%', 'text-align':'left'})
     ]
 )
 
